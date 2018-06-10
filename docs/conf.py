@@ -30,8 +30,7 @@ sys.path.insert(0, os.path.abspath('./..'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-#sys.path[0:0] = [os.path.abspath('_themes/foundation-sphinx-theme')]
-#'foundation_sphinx_theme'
+
 extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
@@ -126,9 +125,9 @@ html_theme_options = {
     #
     # Values: amber, blue, brown, cyan deep_orange, deep_purple, green, grey, indigo, light_blue,
     #         light_green, lime, orange, pink, purple, red, teal, yellow(Default: indigo)
-    'primary_color': 'cyan',
+    'primary_color': 'lime',
     # Values: Same as primary_color. (Default: pink)
-    'accent_color': 'orange',
+    'accent_color': 'teal',
 
     # Customize layout.
     # For details see link.
@@ -148,108 +147,6 @@ html_theme_options = {
     # Values: True, False (Default: True)
     'show_footer': True
 }
-
-
-# html_theme_options = {
-#         'motto': 'Neurobotics Cogmaster project at the Ecole Normale Supérieure / Univ. Paris Descartes',
-
-#         # Your stylesheet relative to the _static dir.
-#         # Default is 'foundation/css/basic.css'
-#         'stylesheet': 'foundation/css/cards.css',
-
-#         # Logo image in SVG format. If the browser doesn't support SVG
-#         # It will try to load JPG with the same name.
-#         'logo_screen': 'http://younesse.net/images/Neurorobotics/logo_project.svg',
-
-#         # Logo for small screens. If ommited, logo_screen will be used.
-#         'logo_mobile': '',
-
-#         # Path to your favicon.ico file relative to the _static dir.
-#         'favicon': '',
-
-#         # Use this if the top-level items of the toctree don't fit in the top-bar navigation.
-#         # If True, the whole toctree will be placed inside a single top-level item.
-#         'top_bar_force_fit': False,
-
-#         # The title of the aformentioned top-level item. Default is "Sections"
-#         #'top_bar_content_title': 'Sections',
-
-#         # If set, Google Analytics code will be appended to body of each page.
-#         #'google_analytics_id': 'your-google-analytics-id',
-
-#         # The "og:title", "og:type", "og:url", "og:site_name" and "og:description" Open Graph tags
-#         # will be generated automatically, but you should specify the
-#         # path to the image that you want to be used
-#         # in the required "og:image" property relative to the _static dir.
-#         #'opengraph_image': 'path/to/your/opengraph-image.jpg',
-
-#         # Any custom additional OG tags
-#         #'opengraph_tags': {
-#         #        'foo': 'bar', # will be rendered as <meta property="og:foo" content="bar" />
-#         #},
-
-#         # The "description" meta tag will be created automatically, but
-#         # you can specify additional meta tags here.
-#         #'meta_tags': {
-#         #        'foo': 'bar', # will be rendered as <meta name="foo" content="bar">
-#         #},
-
-#         # The value for "description" and "og:description" metatags.
-#         # If omitted, the value of "motto" will be used.
-#         'seo_description': 'Kexin Ren & Younesse Kaddar\'s neurorobotics project at ENS Ulm/Uni. Paris Decartes on inferring space from sensorimotor dependencies',
-
-#         # Use this as the base for Open Graph URLs without trailing slash.
-#         #'base_url': 'http://example.com',
-
-#         # If true a bar with Facebook, Google+ and Twitter social buttons will be displayed
-#         # underneath the header.
-#         'social_buttons': True,
-
-#         # ID of your Facebook app associated with the Facebook Like button.
-#         #'facebook_app_id': '123456789',
-
-#         # A Twitter ID used for the via mention of the Twitter button.
-#         #'twitter_id': 'FoundationSphinx',
-
-#         # Flattr button settings.
-#         #'flattr_id': 'andypipkin', # Your Flattr ID
-#         #'flattr_title': '', # If missing docstitle or title will be used.
-#         #'flattr_description': '', # If missing seo_description or motto will be used.
-#         #'flattr_tags': '', # Optional.
-
-
-#         # If "author" and "copyright_year" are set they will override the "copyright" setting.
-
-#         # Author's name.
-#         'author': 'Kexin Ren & Younesse Kaddar',
-
-#         # Author's link.
-#         'author_link': 'http://younesse.net',
-
-#         # Year to be used in the copyright statement.
-#         'copyright_year': '2018',
-
-#         # Author's Google+ id. If set a G+ authorship link will be added.
-#         #'google_plus_id': '117034840853387702598',
-
-
-#         # Fork me on GitHub ribbon will be displayed if "github_user", "github_repo" and "github_ribbon_image" are set:
-#         # https://github.com/blog/273-github-ribbons
-#         # Ribbons are hidden on small screens!
-
-#         # Your GitHub ID.
-#         'github_user': 'youqad',
-
-#         # The repository slug.
-#         'github_repo': 'Neurorobotics_Project',
-
-#         # Path to the ribbon image relative to the "_static" directory.
-#         #'github_ribbon_image': 'my-github-ribbon.png',
-
-#         # Position of the ribbon "left" or "right".
-#         'github_ribbon_position': 'right',
-# }
-# html_theme_path = foundation_sphinx_theme.HTML_THEME_PATH
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -276,7 +173,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Inferringspacefromsensorimotordependenciesdoc'
+htmlhelp_basename = 'ChaoticNeuralNetworksDoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -303,8 +200,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Inferringspacefromsensorimotordependencies.tex', 'Inferring space from sensorimotor dependencies Documentation',
-     'Kexin Ren \\& Younesse Kaddar', 'manual'),
+    (master_doc, 'ChaoticNeuralNetworks.tex', 'Chaotic Neural Networks Documentation',
+     'Younesse Kaddar', 'manual'),
 ]
 
 
@@ -313,7 +210,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'inferringspacefromsensorimotordependencies', 'Inferring space from sensorimotor dependencies Documentation',
+    (master_doc, 'ChaoticNeuralNetworks', 'Chaotic Neural Networks Documentation',
      [author], 1)
 ]
 
@@ -324,8 +221,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Inferringspacefromsensorimotordependencies', 'Inferring space from sensorimotor dependencies Documentation',
-     author, 'Inferringspacefromsensorimotordependencies', 'One line description of project.',
+    (master_doc, 'ChaoticNeuralNetworks', 'Chaotic Neural Networks Documentation',
+     author, 'ChaoticNeuralNetworks', 'One line description of project.',
      'Miscellaneous'),
 ]
 
