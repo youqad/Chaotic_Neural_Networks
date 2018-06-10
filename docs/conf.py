@@ -125,7 +125,7 @@ html_theme_options = {
     #
     # Values: amber, blue, brown, cyan deep_orange, deep_purple, green, grey, indigo, light_blue,
     #         light_green, lime, orange, pink, purple, red, teal, yellow(Default: indigo)
-    'primary_color': 'lime',
+    'primary_color': 'light_green',
     # Values: Same as primary_color. (Default: pink)
     'accent_color': 'teal',
 

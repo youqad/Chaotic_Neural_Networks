@@ -20,8 +20,7 @@ class NetworkA:
   """
   **Neural Architecture A (cf. figure 1):**
 
-      - A recurrent generator network with firing rates \\\(\\\mathbf{r}\\\) driving a linear readout unit with output \\\(z\\\) 
-      through weights \\\(\\\mathbf{r}\\\) that are modified during training.
+      - A recurrent generator network with firing rates \\\(\\\mathbf{r}\\\) driving a linear readout unit with output \\\(z\\\) through weights \\\(\\\mathbf{r}\\\) that are modified during training.
       - Feedback to the generator network is provided by the readout unit.
 
   """
