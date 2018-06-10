@@ -18,9 +18,11 @@ dt = 0.1
 
 class NetworkA:
   """
-  **Neural Architecture A (cf. figure 1):**
+  Neural Architecture A:
 
-      <img src="http://younesse.net/images/Neuromodeling/networkA.png" style="width:50%">
+      .. image:: http://younesse.net/images/Neuromodeling/networkA.png
+        :width: 50%
+        :align: center
 
       - A recurrent generator network with firing rates \\\(\\\mathbf{r}\\\) driving a linear readout unit with output \\\(z\\\) through weights \\\(\\\mathbf{r}\\\) that are modified during training.
       - Feedback to the generator network is provided by the readout unit.
