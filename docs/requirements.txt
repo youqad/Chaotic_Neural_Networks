@@ -1,0 +1,2 @@
+sphinx_materialdesign_theme
+scipy
