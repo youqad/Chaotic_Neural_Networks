@@ -20,9 +20,13 @@ class NetworkA:
   """
   **Neural Architecture A (cf. figure 1):**
 
+      |nnA|
+
       - A recurrent generator network with firing rates \\\(\\\mathbf{r}\\\) driving a linear readout unit with output \\\(z\\\) through weights \\\(\\\mathbf{r}\\\) that are modified during training.
       - Feedback to the generator network is provided by the readout unit.
 
+      .. |nnA| image:: http://younesse.net/images/Neuromodeling/networkA.png
+      :align: middle
   """
   def __init__(self, N_G=N_G, p_GG=p_GG, g_GG=g_GG, g_Gz=g_Gz,
                 f=triangle, dt=dt, Δt=Δt, α=α, τ=τ, seed=1):
