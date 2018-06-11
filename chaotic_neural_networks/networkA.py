@@ -90,7 +90,7 @@ class NetworkA:
         
         self.J_Gz = 2*np.random.rand(N_G, nb_outputs) - 1
         
-        self.w = np.zeros(N_G, nb_outputs)
+        self.w = np.zeros((N_G, nb_outputs))
         self.x = 0.5 * np.random.randn(N_G)
         self.r = np.tanh(self.x)
         self.z = 0.5 * np.random.randn(nb_outputs)
@@ -116,8 +116,13 @@ class NetworkA:
         (len(self.z_list),) array
             Train of test error, depending on `train_test`
         """  
-        z_arr = np.array(self.z_list[train_test])
-        return np.mean(np.abs(z_arr[:,1] - self.f(z_arr[:,0])), axis=0)
+        z_time, z_val = map(np.array, zip(*self.z_list[train_test]))
+        f_time = self.f(z_time)
+
+        if len(z_val.shape) > len(f_time.shape)==1:
+            f_time = f_time.reshape([-1, 1])
+
+        return np.mean(np.abs(z_val-f_time), axis=0)
 
     def step(self, train_test='train'):
         """Execute one time step of length ``dt`` of the network dynamics.
