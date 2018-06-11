@@ -73,7 +73,7 @@ class NetworkA:
         - Feedback to the generator network is provided by the readout unit.
     """
     def __init__(self, N_G=N_G, p_GG=p_GG, g_GG=g_GG, g_Gz=g_Gz,
-                f=triangle, dt=dt, Δt=Δt, α=α, τ=τ, seed=1):
+                f=triangle, dt=dt, Δt=Δt, α=α, τ=τ, seed=1, nb_outputs=1):
         
         self.N_G, self.p_GG, self.g_GG, self.g_Gz = N_G, p_GG, g_GG, g_Gz
         self.f, self.dt, self.Δt, self.α, self.τ = f, dt, Δt, α, τ
@@ -88,12 +88,12 @@ class NetworkA:
         self.J_GG = std*sparse.random(N_G, N_G, density=p_GG, random_state=seed,
                                             data_rvs=np.random.randn).toarray()
         
-        self.J_Gz = 2*np.random.rand(N_G) - 1
+        self.J_Gz = 2*np.random.rand(N_G, nb_outputs) - 1
         
-        self.w = np.zeros(N_G)
+        self.w = np.zeros(N_G, nb_outputs)
         self.x = 0.5 * np.random.randn(N_G)
         self.r = np.tanh(self.x)
-        self.z = 0.5 * np.random.randn()
+        self.z = 0.5 * np.random.randn(nb_outputs)
         self.P = np.eye(N_G)/α
         
         # Storing the values of w and its time-derivative
@@ -117,7 +117,7 @@ class NetworkA:
             Train of test error, depending on `train_test`
         """  
         z_arr = np.array(self.z_list[train_test])
-        return np.mean(np.abs(z_arr[:,1] - self.f(z_arr[:,0])))
+        return np.mean(np.abs(z_arr[:,1] - self.f(z_arr[:,0])), axis=0)
 
     def step(self, train_test='train'):
         """Execute one time step of length ``dt`` of the network dynamics.
@@ -141,7 +141,7 @@ class NetworkA:
         
         self.x = (1 - dt/τ)*self.x + g_GG*self.J_GG.dot(self.r)*dt/τ + g_Gz*self.J_Gz.dot(self.z)*dt/τ
         self.r = np.tanh(self.x)
-        self.z = self.w.dot(self.r)
+        self.z = self.w.T.dot(self.r).flatten()
         self.time_elapsed[train_test] += dt
         current_time = int(train_test!='train')*self.time_elapsed['train']+self.time_elapsed[train_test]
         
