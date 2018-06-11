@@ -11,24 +11,24 @@ Generator Network: Number of neurons
 p_GG = 0.1
 """
 Generator Network: **sparseness parameter** of the connection matrix.
-Each coefficient thereof is set to \\\(0\\\) with probability \\\(1􏰒-p_{GG}\\\).
+Each coefficient thereof is set to \\\(0\\\) with probability \\\(1-p_{GG}\\\).
 """
 
 p_z = 1.
 """
-**Sparseness parameter** of the readout. A random fraction \\\(1-􏰒p_z\\\) of the components
+Sparseness parameter of the readout: a random fraction \\\(1-p_z\\\) of the components
  of \\\(\\\mathbf{w}\\\) are held to \\\(0\\\).
 """
 
 g_Gz = 1.
 """
-**Scaling factor** of  the feedback loop. 
+Scaling factor of  the feedback loop:
 Increasing the feedback connections result in the network chaotic activity allowing the learning process.
 """
 
 α = 1.
 """
-**Inverse Learning rate parameter:** \\\(P\\\), the estimate of the inverse of the network rates correlation matrix plus a regularization term,
+Inverse Learning rate parameter: \\\(P\\\), the estimate of the inverse of the network rates correlation matrix plus a regularization term,
 is initialized as $$P(0) = \\\\frac 1 α \\\mathbf{I}$$
 
 So a sensible value of \\\(α\\\)
@@ -43,7 +43,7 @@ If
 
 g_GG = 1.5 # g_GG > 1 ⟹ chaos
 """
-**Scaling factor** of the connection synaptic strength matrix of the generator network.
+Scaling factor of the connection synaptic strength matrix of the generator network.
 """
 
 τ = 10.
@@ -58,7 +58,7 @@ Network integration time step.
 
 Δt = 10*dt
 """
-Time span between modifications of the readout weights: $$Δt ≥ dt$$
+Time span between modifications of the readout weights: \\\(Δt ≥ dt\\\)
 """
 
 class NetworkA:
