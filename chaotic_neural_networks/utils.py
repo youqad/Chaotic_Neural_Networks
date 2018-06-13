@@ -25,9 +25,6 @@ triangle = np.vectorize(triangle)
 #------------------------------------------------------------
 # General utility functions
 
-from matplotlib.collections import LineCollection
-from matplotlib.gridspec import GridSpec
-
 def add_collection_curves(ax, ts, data, labels=None, color='indigo',
                          y_lim=None, starting_points=None, Δ=None):
     """

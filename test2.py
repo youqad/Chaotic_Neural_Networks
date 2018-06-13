@@ -1,18 +1,14 @@
-import plotly
-import numpy as np
-import plotly.plotly as py
-import plotly.graph_objs as go
-
-import matplotlib.pyplot as plt
-from matplotlib import animation, rc
-
 from chaotic_neural_networks import utils, networkA
 
 t_max = 500
 seed = 2
 
-network = networkA.NetworkA(seed=seed, f=utils.periodic)
+# Target function: Sum of sinusoids
+network1 = networkA.NetworkA(f=utils.periodic)
+network1.FORCE_sequence(2400*3)
 
-network.FORCE_sequence(2400*3)
+# Target function: triangle wave
+network2 = networkA.NetworkA()
+network2.FORCE_sequence(2400*3)
 
 plt.show()

@@ -1,11 +1,3 @@
-import plotly
-import numpy as np
-import plotly.plotly as py
-import plotly.graph_objs as go
-
-import matplotlib.pyplot as plt
-from matplotlib import animation, rc
-
 from chaotic_neural_networks import utils, networkA
 
 t_max = 500
