@@ -44,6 +44,7 @@ If
 g_GG = 1.5 # g_GG > 1 ⟹ chaos
 """
 Scaling factor of the connection synaptic strength matrix of the generator network.
+$$g_{GG} > 1 ⟹ \\\text{chaotic behavior}$$
 """
 
 τ = 10.
