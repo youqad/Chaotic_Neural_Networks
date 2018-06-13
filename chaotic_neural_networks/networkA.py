@@ -77,10 +77,7 @@ class NetworkA:
                 f=triangle, dt=dt, Δt=Δt, α=α, τ=τ, seed=1, nb_outputs=1):
         
         self.N_G, self.p_GG, self.g_GG, self.g_Gz = N_G, p_GG, g_GG, g_Gz
-        self.f, self.dt, self.Δt, self.α, self.τ = f, dt, Δt, α, τ
-        
-        self.nb_train_steps, self.time_elapsed = 0, {}
-        self.time_elapsed['train'], self.time_elapsed['test'] = 0, 0
+        self.f, self.dt, self.Δt, self.α, self.τ, self.nb_outputs = f, dt, Δt, α, τ, nb_outputs
         
         self.seed = seed
         np.random.seed(seed)
@@ -90,12 +87,17 @@ class NetworkA:
                                             data_rvs=np.random.randn).toarray()
         
         self.J_Gz = 2*np.random.rand(N_G, nb_outputs) - 1
+        self._init_variables()
+
+    def _init_variables(self):
+        self.nb_train_steps = 0
+        self.time_elapsed = 0
         
-        self.w = np.zeros((N_G, nb_outputs))
-        self.x = 0.5 * np.random.randn(N_G)
+        self.w = np.zeros((self.N_G, self.nb_outputs))
+        self.x = 0.5 * np.random.randn(self.N_G)
         self.r = np.tanh(self.x)
-        self.z = 0.5 * np.random.randn(nb_outputs)
-        self.P = np.eye(N_G)/α
+        self.z = 0.5 * np.random.randn(self.nb_outputs)
+        self.P = np.eye(self.N_G)/self.α
         
         # Storing the values of w and its time-derivative
         self.w_list = []
@@ -125,7 +127,7 @@ class NetworkA:
 
         return np.mean(np.abs(z_val-f_time), axis=0)
 
-    def step(self, train_test='train'):
+    def step(self, train_test='train', store=True):
         """Execute one time step of length ``dt`` of the network dynamics.
         
         Parameters
@@ -148,9 +150,10 @@ class NetworkA:
         self.x = (1 - dt/τ)*self.x + g_GG*self.J_GG.dot(self.r)*dt/τ + g_Gz*self.J_Gz.dot(self.z)*dt/τ
         self.r = np.tanh(self.x)
         self.z = self.w.T.dot(self.r).flatten()
-        self.time_elapsed[train_test] += dt
-        current_time = int(train_test!='train')*self.time_elapsed['train']+self.time_elapsed[train_test]
-        
+        self.time_elapsed += dt
+        #current_time = int(train_test!='train')*self.time_elapsed['train']+self.time_elapsed[train_test]
+        Δw = np.zeros(self.w.shape)
+
         if train_test == 'train':
             self.nb_train_steps+=1
             if self.nb_train_steps%(Δt//dt) == 0:
@@ -159,15 +162,162 @@ class NetworkA:
                 self.P -= np.outer(Pr, self.r).dot(self.P)/(1+self.r.dot(Pr))
 
                 # prediction error update
-                self.e_minus = self.z - self.f(current_time)
+                self.e_minus = self.z - self.f(self.time_elapsed)
 
                 # output weights update
                 Δw = np.outer(self.P.dot(self.r), self.e_minus)
                 self.w -= Δw
+        
+        if store:
+            # Store w and \dot{w}'s norm
+            self.w_list.append((self.time_elapsed, np.linalg.norm(self.w, axis=0)))
+            self.w_dot_list.append((self.time_elapsed, np.linalg.norm(Δw/Δt, axis=0)))
 
-                # Store w and \dot{w}'s norm
-                self.w_list.append((current_time, np.linalg.norm(self.w)))
-                self.w_dot_list.append((current_time, np.linalg.norm(Δw/Δt)))
+            # Store z
+            self.z_list[train_test].append((self.time_elapsed, self.z))
+        
+    def FORCE_figure(self, ts, fs, zs, xs, ws, neuron_indexes=None, already_split=True):
+        lw_f, lw_z = 3, 1.5
+        nb_split = 3 # 3 phases: pre-training, training, testing (post-training)
+        if neuron_indexes is None:
+            neuron_indexes = np.arange(len(xs))
+
+        fig = plt.figure(figsize=(17, 13))
+        gs = GridSpec(3, 3)
+
+        if not already_split:
+            fs_list, zs_list, xs_list, ws_list, ts_list = [np.array_split(y, nb_split, axis=len(y.shape)-1) 
+                                                        for i,y in enumerate([fs, zs, xs, ws, ts])]
+        else:
+            fs_list, zs_list, xs_list, ws_list, ts_list = fs, zs, xs, ws, ts
+
+        f_lim, x_lim, w_lim = [(min([i.min() for i in L]), max([i.max() for i in L])) for L in [fs, xs, ws]]
+
+        Δ = 1.2*(x_lim[1] - x_lim[0])
+
+        for i, (fs_sub, zs_sub, xs_sub, ws_sub, ts_sub, title) in enumerate(zip(fs_list, zs_list, xs_list, ws_list, ts_list, 
+                                                                                ['Spontaneous Activity', 'Learning', 'Testing'])):
+            if len(fs_sub.shape)==1:
+                fs_sub = [fs_sub]
+            if len(zs_sub.shape)==1:
+                zs_sub = [zs_sub]
+            if len(ws_sub.shape)==1:
+                ws_sub = [ws_sub]
+                
+            # Plotting f and z
+            ax_fz = fig.add_subplot(gs[0,i])
+            ax_fz.set_title(title).set_fontsize('x-large')
             
-        # Store z
-        self.z_list[train_test].append((current_time, self.z))
+            highest_color = .9 if len(fs_sub)>1 else .6
+            ax_fz.set_prop_cycle(plt.cycler('color', plt.cm.Greens(np.linspace(0, highest_color, len(fs_sub)+1)[1:]))) 
+            for j, f in enumerate(fs_sub):
+                ax_fz.plot(ts_sub, f, lw=lw_f, label='$f_{'+str(j+1)+'}$' if len(fs_sub)>1 else '$f$')
+            
+            ax_fz.set_prop_cycle(plt.cycler('color', plt.cm.Reds(np.linspace(0, highest_color, len(zs_sub)+1)[1:])))
+            for j, z in enumerate(zs_sub):
+                ax_fz.plot(ts_sub, z, lw=lw_z, label='$z_{'+str(j+1)+'}$' if len(zs_sub)>1 else '$z$')
+            
+            ax_fz.legend(loc='best', fancybox=True, framealpha=0.7)
+            ax_fz.set_ylim((f_lim[0]-.5, f_lim[1]+.5))
+            pos = [['left'], [], ['right']]
+            draw_axis_lines(ax_fz, pos[i])
+
+            
+            # Plotting the firing rates of sample neurons
+            ax_x = fig.add_subplot(gs[1,i])
+            draw_axis_lines(ax_x, [])
+            add_collection_curves(ax_x, ts_sub, xs_sub.T, y_lim=(x_lim[0]-.1, x_lim[1]+.1), Δ=Δ,
+                                labels=['Neuron ${}$'.format(i) for i in neuron_indexes] if i==0 else None)
+            
+            # Plotting the time-derivative of the readout weight vector
+            ax_w = fig.add_subplot(gs[2,i])
+            
+            highest_color = .9 if len(ws_sub)>1 else .6
+            ax_w.set_prop_cycle(plt.cycler('color', plt.cm.Oranges(np.linspace(0, highest_color, len(ws_sub)+1)[1:])))
+            
+            for j, w in enumerate(ws_sub):
+                ax_w.plot(ts_sub, w, label='$|\dot{w_{'+str(j+1)+'}}|$' if len(ws_sub)>1 else '$|\dot{w}|$')
+            
+            ax_w.legend(loc='best', fancybox=True, framealpha=0.7)
+            ax_w.set_ylim(*w_lim)
+            draw_axis_lines(ax_w,['bottom'])
+            ax_w.set_xlabel('Time (ms)')
+
+        fig.suptitle("FORCE Training Sequence").set_fontsize('xx-large')
+        self.fig = fig
+        return fig
+        
+    def FORCE_sequence(self, t_max, number_neurons=5):
+        # Reinitialization of the network
+        self._init_variables()
+        ts_list = np.array_split(np.arange(0, t_max, self.dt), 3)
+        ts_pretrain, ts_train, ts_test = ts_list
+        
+        fs_list, zs_list, xs_list, ws_list = [], [], [], []
+
+        # Random neuron indices: the neurons we will plot
+        mask_random = np.arange(self.N_G)
+        np.random.shuffle(mask_random)
+        mask_random = mask_random[:number_neurons]
+
+        #------------------------------------------------------------
+        # Pre-training / Spontaneous activity
+        print('Pre-training / Spontaneous activity...')
+        xs_sublist, zs_sublist = [], []
+
+        for _ in ts_pretrain:
+            self.step(train_test='test', store=False)
+            xs_sublist.append(self.r[mask_random])
+            zs_sublist.append(self.z)
+
+        xs_list.append(np.array(xs_sublist))
+        zs_list.append(np.array(list(zip(*zs_sublist))))
+        ws_list.append(np.zeros((self.nb_outputs, len(ts_pretrain))))
+        fs_list.append(self.f(ts_pretrain))
+     
+
+        #------------------------------------------------------------
+        # TRAINING Phase
+        print('Training...')
+
+        xs_sublist, zs_sublist = [], []
+
+        for _ in ts_train:
+            self.step()
+            xs_sublist.append(self.r[mask_random])
+        
+        xs_list.append(np.array(xs_sublist))
+
+        _, zs_sublist = zip(*self.z_list['train'])
+        _, ws_sublist = zip(*self.w_dot_list)
+        
+        zs_list.append(np.array(list(zip(*zs_sublist))))
+        ws_list.append(np.array(list(zip(*ws_sublist))))
+        fs_list.append(self.f(ts_train))
+
+        print('> **Average Train Error:** {}'.format(self.error()))
+
+        #------------------------------------------------------------
+        # TESTING phase
+        print('Testing...')
+
+        xs_sublist, zs_sublist = [], []
+
+        for _ in ts_train:
+            self.step(train_test='test')
+            xs_sublist.append(self.r[mask_random])
+        
+        xs_list.append(np.array(xs_sublist))
+
+        _, zs_sublist = zip(*self.z_list['test'])
+
+        zs_list.append(np.array(list(zip(*zs_sublist))))
+        ws_list.append(np.full(len(ts_test), ws_sublist[-1]))
+        fs_list.append(self.f(ts_test))
+
+        print('> **Average Test Error:** {}'.format(self.error(train_test='test')))
+
+        print(xs_list, ws_list)
+        self.FORCE_figure(ts_list, fs_list, zs_list, xs_list, ws_list,
+                             neuron_indexes=mask_random).show()
+

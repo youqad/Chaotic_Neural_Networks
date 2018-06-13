@@ -9,7 +9,7 @@ from matplotlib.gridspec import GridSpec
 #------------------------------------------------------------
 # Target functions
 
-def periodic(t, amp=3., freq=1/600):
+def periodic(t, amp=3., freq=1/300):
     """Generates a periodic function which a sum of 4 sinusoids.
     """
     return amp*np.sin(np.pi*freq*t) + (amp/2) * np.sin(2*np.pi*freq*t) + (amp/3) * np.sin(3*np.pi*freq*t) + (amp/4) * np.sin(4*np.pi*freq*t)
@@ -24,6 +24,9 @@ triangle = np.vectorize(triangle)
 
 #------------------------------------------------------------
 # General utility functions
+
+from matplotlib.collections import LineCollection
+from matplotlib.gridspec import GridSpec
 
 def add_collection_curves(ax, ts, data, labels=None, color='indigo',
                          y_lim=None, starting_points=None, Δ=None):
@@ -52,8 +55,8 @@ def add_collection_curves(ax, ts, data, labels=None, color='indigo',
     if labels is not None:
         ax.set_yticks(ticks_positions+data[:,0])
         ax.set_yticklabels(labels)
-
-
+        ax.tick_params(axis='y', colors=color)
+    
 def draw_axis_lines(ax, positions):
     if 'right' in positions or 'left' in positions:
         ax.yaxis.set_ticks_position('left') if 'left' in positions else ax.yaxis.set_ticks_position('right')

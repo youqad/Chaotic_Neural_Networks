@@ -19,7 +19,7 @@ lw_f, lw_z = 3, 1.5
 # TRAIN Phase
 f_train = network.f(ts_train)
 
-plt.figure(figsize=(15, 3*4))
+fig = plt.figure(figsize=(15, 3*4))
 j = 1
 
 for i, t in enumerate(ts_train):
