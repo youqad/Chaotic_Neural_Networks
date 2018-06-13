@@ -2,6 +2,11 @@
 Implementation of D. Sussillo and L.F. Abbott's 2009 article
 ------------------------------------------------------------
 
+- [Documentation](https://chaotic-neural-networks.readthedocs.io)
+- [iPython notebook](http://younesse.net/ipynb/neuromodeling/Project_Chaotic_Neural_Networks.html)
+- [Github](https://github.com/youqad/Chaotic_Neural_Networks/edit/master/README.md)
+- [Report](http://younesse.net/Neuromodeling/Project_Chaotic_Neural_Networks/)
+
 """
 
 __version__ = '0.0.1'
