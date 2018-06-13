@@ -6,6 +6,7 @@ Neuromodeling (AT2) Cogmaster project: **Generating Coherent Patterns of Activit
 
 - [Documentation](https://chaotic-neural-networks.readthedocs.io)
 - [iPython notebook](http://younesse.net/ipynb/neuromodeling/Project_Chaotic_Neural_Networks.html)
-- [Online Report](http://younesse.net/Neuromodeling/Project_Chaotic_Neural_Networks/)
+- [Github](https://github.com/youqad/Chaotic_Neural_Networks/edit/master/README.md)
+- [Report](http://younesse.net/Neuromodeling/Project_Chaotic_Neural_Networks/)
 
 
