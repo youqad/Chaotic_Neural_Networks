@@ -162,7 +162,7 @@ class NetworkA:
                 self.e_minus = self.z - self.f(current_time)
 
                 # output weights update
-                Δw = self.e_minus*self.P.dot(self.r)
+                Δw = np.outer(self.P.dot(self.r), self.e_minus)
                 self.w -= Δw
 
                 # Store w and \dot{w}'s norm
