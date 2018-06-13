@@ -21,6 +21,22 @@ def triangle(t, freq=1/600, amp=3):
     return amp*signal.sawtooth(2*np.pi*freq*t, 0.5)
 triangle = np.vectorize(triangle)
 
+def complicated_periodic(t, amp=1., freq=1/300, seed=1):
+    """Generates a complicated periodic function which a sum of 10 sinusoids.
+    """
+    np.random.seed(seed)
+    amps = np.random.randint(1, 5, size=(6,))
+    freqs = np.random.randint(1, 10, size=(6,))
+    return sum(am*amp*np.sin(fr*np.pi*freq*t) for am, fr in zip(amps, freqs))
+complicated_periodic = np.vectorize(complicated_periodic)
+
+
+def both(f, g):
+    """Generates  the functions \\\(t ⟼ (f(t), g(t))\\\)
+    """
+    return (lambda t: np.array([f(t), g(t)]) if isinstance(t, float) else np.array(list(zip(f(t), g(t)))))
+
+per_tri = both(periodic, triangle)
 
 #------------------------------------------------------------
 # General utility functions

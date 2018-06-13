@@ -1,14 +1,18 @@
 from chaotic_neural_networks import utils, networkA
+import matplotlib.pyplot as plt
 
-t_max = 500
-seed = 2
+t_max = 7200
+seed=2
 
 # Target function: Sum of sinusoids
-network1 = networkA.NetworkA(f=utils.periodic)
-network1.FORCE_sequence(2400*3)
+# network = networkA.NetworkA(f=utils.periodic)
 
 # Target function: triangle wave
-network2 = networkA.NetworkA()
-network2.FORCE_sequence(2400*3)
+#network = networkA.NetworkA()
+
+# Target function: complicated sum of sinusoids
+network = networkA.NetworkA(f=utils.complicated_periodic)
+
+network.FORCE_sequence(t_max*3)
 
 plt.show()

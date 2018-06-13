@@ -177,7 +177,7 @@ class NetworkA:
             self.z_list[train_test].append((self.time_elapsed, self.z))
         
     def FORCE_figure(self, ts, fs, zs, xs, ws, neuron_indexes=None, already_split=True):
-        lw_f, lw_z = 3, 1.5
+        lw_f, lw_z = 3.5, 1.5
         nb_split = 3 # 3 phases: pre-training, training, testing (post-training)
         if neuron_indexes is None:
             neuron_indexes = np.arange(len(xs))
