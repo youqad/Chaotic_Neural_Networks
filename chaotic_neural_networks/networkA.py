@@ -414,7 +414,7 @@ class NetworkA:
 
         for _ in ts:
             self.step(train_test='test')
-            xs_list.append(self.x)
+            xs_list.append(self.r)
 
         xs_list = np.array(xs_list)
         self.eig_vec, self.proj, self.eig_val = PCA(xs_list, nb_eig=nb_eig, return_matrix=True, return_eigenvalues=True)
@@ -427,7 +427,7 @@ class NetworkA:
         
         # Projection over the leading principal components
         proj_w = self.w.T.dot(self.eig_vec)
-        z_eig = np.tanh(self.proj).dot(proj_w.T)
+        z_eig = self.proj.dot(proj_w.T)
         if len(z_eig.shape)==1:
             z_eig = z_eig.reshape([-1, 1])
         z_eig_list = np.array(list(zip(*z_eig)))
