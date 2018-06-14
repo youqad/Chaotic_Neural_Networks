@@ -248,6 +248,27 @@ class NetworkA:
         return fig
         
     def FORCE_sequence(self, t_max, number_neurons=5):
+        """
+        Returns a matplotlib figure of a full FORCE training sequence, showing the evolution of:
+        
+        - network ouput(s)
+        - ``number_neurons`` neurons membrane potential
+        - and the time-derivative of the readout vector \\\(\\\dot{\\\\textbf{w}}\\\) 
+        
+        before training (spontaneous activity), throughout training, and after training (test phase): each one of these phases lasts ``t_max/3``.
+
+        See ``training_sequence_plots.py`` in the github repository for further examples.
+
+        Examples
+        --------
+        >> network = networkA.NetworkA(f=utils.periodic); network.FORCE_sequence(600)
+        Pre-training / Spontaneous activity...
+        Training...
+        > **Average Train Error:** [ 0.02805716]
+        Testing...
+        > **Average Test Error:** [ 2.50709125]
+        """
+        assert t_max%3==0
         # Reinitialization of the network
         self._init_variables()
         ts_list = np.array_split(np.arange(0, t_max, self.dt), 3)
@@ -329,3 +350,88 @@ class NetworkA:
         self.FORCE_figure(ts_list, fs_list, zs_list, xs_list, ws_list,
                              neuron_indexes=mask_random).show()
 
+    def _principal_components_figure(self, ts, fs_list, zs_list, xs_list, eigvals):
+        lw_f, lw_z = 3.5, 1.5
+        fig = plt.figure(figsize=(17, 13))
+        gs = GridSpec(3, 1)
+
+        f_lim, x_lim = [(i.min(), i.max()) for i in [fs_list, xs_list]]
+
+        Δ = 1.2*(x_lim[1] - x_lim[0])
+
+        if len(fs_list.shape)==1:
+            fs_list = [fs_list]
+        if len(zs_list.shape)==1:
+            zs_list = [zs_list]
+            
+        # Plotting f and z_eig (projection on leading components)
+        ax_fz = fig.add_subplot(gs[0])
+        ax_fz.set_title('Projection onto the {} leading principal components'.format(len(xs_list))).set_fontsize('x-large')
+        
+        highest_color = .9 if len(fs_list)>1 else .6
+        ax_fz.set_prop_cycle(plt.cycler('color', plt.cm.Greens(np.linspace(0, highest_color, len(fs_list)+1)[1:]))) 
+        for j, f in enumerate(fs_list):
+            ax_fz.plot(ts, f, lw=lw_f, label='$f_{'+str(j+1)+'}$' if len(fs_list)>1 else '$f$')
+        
+        ax_fz.set_prop_cycle(plt.cycler('color', plt.cm.Reds(np.linspace(0, highest_color, len(zs_list)+1)[1:])))
+        for j, z in enumerate(zs_list):
+            ax_fz.plot(ts, z, lw=lw_z, label='$z_{'+str(j+1)+'}$' if len(zs_list)>1 else '$z$')
+        
+        ax_fz.legend(loc='best', fancybox=True, framealpha=0.7)
+        ax_fz.set_ylim((f_lim[0]-.5, f_lim[1]+.5))
+        draw_axis_lines(ax_fz, ['left'])
+
+        # Plotting the firing rates of sample neurons
+        ax_x = fig.add_subplot(gs[1])
+        draw_axis_lines(ax_x, ['bottom'])
+        ax_x.set_xlabel('Time (ms)')
+        ax_x.xaxis.set_label_coords(1.05, -0.025)
+        add_collection_curves(ax_x, ts, xs_list, y_lim=(x_lim[0]-.1, x_lim[1]+.1), Δ=Δ,
+                            labels=['PC ${}$'.format(len(xs_list)-i) for i in range(len(xs_list))])
+        
+        # Plotting the time-derivative of the readout weight vector
+        ax_w = fig.add_subplot(gs[2])
+        
+        ax_w.semilogy(eigvals, color='blue', label='eigenvalues (logscale)')
+        
+        ax_w.legend(loc='best', fancybox=True, framealpha=0.7)
+        draw_axis_lines(ax_w,['left', 'bottom'])
+        ax_w.set_xlabel('Index')
+
+        fig.suptitle("Principal Component Analysis of Network Activity").set_fontsize('xx-large')
+        self.fig_eig = fig
+        return fig
+
+
+    def principal_components(self, t_max, nb_eig=8):
+        #------------------------------------------------------------
+        # TESTING phase
+        print('Testing...')
+        
+        ts = np.arange(self.time_elapsed, self.time_elapsed+t_max, self.dt)
+
+        xs_list = []
+
+        for _ in ts:
+            self.step(train_test='test')
+            xs_list.append(self.x)
+
+        xs_list = np.array(xs_list)
+        self.eig_vec, self.proj, self.eig_val = PCA(xs_list, nb_eig=nb_eig, return_matrix=True, return_eigenvalues=True)
+
+        f_time = self.f(ts)
+
+        if len(f_time.shape)==1:
+            f_time = f_time.reshape([-1, 1])
+        fs_list = np.array(list(zip(*f_time)))
+        
+        # Projection over the leading principal components
+        proj_w = self.w.T.dot(self.eig_vec)
+        z_eig = np.tanh(self.proj).dot(proj_w.T)
+        if len(z_eig.shape)==1:
+            z_eig = z_eig.reshape([-1, 1])
+        z_eig_list = np.array(list(zip(*z_eig)))
+
+        self.eig_val = self.eig_val[::-1]
+
+        self._principal_components_figure(ts, fs_list, z_eig_list, self.proj.T, self.eig_val).show()

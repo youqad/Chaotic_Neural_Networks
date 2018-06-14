@@ -104,119 +104,44 @@ def draw_axis_lines(ax, positions):
 #------------------------------------------------------------
 # PCA to compute the degrees of freedom
 
-def PCA(data, return_matrix=False, return_eigenvalues=False):
+def PCA(data, nb_eig=8, return_matrix=True, return_eigenvalues=True):
     """                                                                                       
-    Principal Component Analysis (PCA) to compute the leading principal components.
+    Principal Component Analysis (PCA) to compute the ``nb_eig`` leading principal components.
 
     Parameters                                                                                
     ----------                                                                                
     data : (n, k) array                                                                          
         Data points matrix (data points = row vectors in the matrix)
-    return_matrix : bool
+    nb_eig : int, optional                                                                          
+        Number of leading principal components returned
+    return_matrix : bool, optional
         If True, returns the matrix of the data points projection on the eigenvectors
     return_eigenvalues : bool, optional
         Returns the eigenvalues.                                                       
                                                                                                
     Returns                                   
     -------                                                                                
-    nb : int                                                                        
-        Number of non-zero eigenvalues of the covariance matrix,
-        thought of as the number of leading principal components.
-        The eigenvalues thereof into two classes ("non-zero" and "zero" eigenvalues) \\\(C_1\\\) and \\\(C_2\\\),
-        distinguished as follows: 
-        > each \\\(λ ∈ C_1\\\) has a size closer to other the \\\(λ\\\)'s of \\\(C_1\\\) 
-        than the ones of \\\(C_2\\\), and conversely. 
-        The boundary between \\\(C_1\\\) and \\\(C_2\\\) corresponds to the largest ratio \\\(λ_{i+1}/λ_i\\\),
-        where the \\\(λ_i\\\) are in decreasing order.
-    Proj : (N_G, t_max) array                                                                          
-        If return_matrix == True: Projection of the data points on the eigenvectors                                                     
+    (k, nb_eig) array                                                                       
+        Leading principal components/eigenvectors (columnwise).
+    Proj : (t_max, N_G) array                                                                          
+        If return_matrix == True: Projection of the data points on the principal eigenvectors.                                                
     """
 
     # Covariance matrix
-    cov_matrix = np.cov(preprocessing.scale(data))
+    cov_matrix = np.cov(preprocessing.scale(data.T))
 
     # Diagonalization of the covariance matrix
     eig_val, eig_vec = np.linalg.eigh(cov_matrix)
     
-    # Compute the boundary index separating zero eigenvalues to non-zero ones
-    ratios = [eig_val[i+1]/eig_val[i] for i in range(len(eig_val)-1)]
-    max_ratio = np.argmax(ratios)
-    
     if return_matrix or return_eigenvalues:
         if return_matrix:
             # Projection of the data points over the eigenvectors 
-            Proj = data.dot(eig_vec[:,max_ratio+1:])
+            Proj = data.dot(eig_vec[:,-nb_eig:])
         if return_matrix and return_eigenvalues:
-            return eig_vec[max_ratio+1:], Proj, eig_val
+            return eig_vec[:,-nb_eig:], Proj, eig_val
         elif return_matrix:
-            return eig_vec[max_ratio+1:], Proj
+            return eig_vec[:,-nb_eig:], Proj
         else:
-            return eig_vec[max_ratio+1:], eig_val
+            return eig_vec[:,-nb_eig:], eig_val
 
-    return eig_vec[max_ratio+1:]
-
-#------------------------------------------------------------
-# Classical multidimensional scaling (MDS)
-
-def MDS(data, return_matrix=False, return_eigenvalues=False):
-    """                                                                                       
-    Classical multidimensional scaling (MDS) to compute the leading principal components
-    cf. https://en.wikipedia.org/wiki/Multidimensional_scaling#Classical_multidimensional_scaling
-                                                                                               
-    Parameters                                                                                
-    ----------                                                                                
-    data : (n, k) array                                                                          
-        Data points matrix (data points = row vectors in the matrix)
-    return_matrix : bool
-        If True, returns the coordinate matrix
-    return_eigenvalues : bool, optional
-        Returns the eigenvalues (``False`` by default).                                                
-                                                                                               
-    Returns                                   
-    -------                                                                               
-    nb : int                                                                        
-        Number of "non-zero" eigenvalues of $$B = X X^T$$ (where \\\(X\\\) is the coordinate matrix), 
-        thought of as the number of leading principal components.
-        The eigenvalues fall into two classes (non-zero and zero eigenvalues): cf. ``utils.PCA`` to see how they are distinguished.
-    X : (n, dim_rigid_group) array                                                                          
-        If return_matrix == True: Coordinate matrix.                                                    
-    """
-    
-    # Number of points                                                                        
-    n = len(data)
-
-    # 1. Squared Symmetric pairwise distance matrix.
-    D_sq = distance.cdist(data, data, 'euclidean')**2
- 
-    # Centering matrix                                                                        
-    J = np.eye(n)-np.ones((n, n))/n
- 
-    # 2. Double centering: B = X X^T                                                                                    
-    B = -J.dot(D_sq).dot(J)/2
- 
-    # 3. Diagonalize
-    eig_val, eig_vec = np.linalg.eigh(B)
-
-    # Compute the boundary index separating zero eigenvalues to non-zero ones
-    ratios = [eig_val[i+1]/eig_val[i] for i in range(len(eig_val)-1)]
-    max_ratio = np.argmax(ratios)
-    
-    if return_matrix or return_eigenvalues:
-        if return_matrix:
-            # Compute the coordinate matrix
-            Λ_sqrt  = np.diag(np.sqrt(eig_val[max_ratio+1:]))
-            E  = eig_vec[max_ratio+1:]
-            X  = E.dot(Λ_sqrt)
-        if return_matrix and return_eigenvalues:
-            return eig_vec[max_ratio+1:], X, eig_val
-        elif return_matrix:
-            return eig_vec[max_ratio+1:], X
-        else:
-            return eig_vec[max_ratio+1:], eig_val
-
-    return eig_vec[max_ratio+1:]
-
-#------------------------------------------------------------
-# Dictionary to access the dimension reduction functions in the classes later
-
-dim_reduction_dict = {'PCA': PCA, 'MDS': MDS}
+    return eig_vec[:,-nb_eig:]
