@@ -116,7 +116,7 @@ html_theme_options = {
     'header_links' : [
         ('Home', 'index', False, 'home'),
         ("GitHub", "https://github.com/youqad/Chaotic_Neural_Networks", True, 'link'),
-        ("Report", "http://younesse.net/Neuromodeling/Project/", True, 'launch')
+        ("Report", "http://younesse.net/Neuromodeling/Project_Chaotic_Neural_Networks/", True, 'launch')
     ],
 
     # Customize css colors.
