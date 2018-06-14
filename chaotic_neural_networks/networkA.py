@@ -273,7 +273,10 @@ class NetworkA:
         xs_list.append(np.array(xs_sublist))
         zs_list.append(np.array(list(zip(*zs_sublist))))
         ws_list.append(np.zeros((self.nb_outputs, len(ts_pretrain))))
-        fs_list.append(self.f(ts_pretrain))
+        f_time = self.f(ts_pretrain)
+        if len(f_time.shape)==1:
+            f_time = f_time.reshape([-1, 1])
+        fs_list.append(np.array(list(zip(*f_time))))
      
 
         #------------------------------------------------------------
@@ -293,7 +296,10 @@ class NetworkA:
         
         zs_list.append(np.array(list(zip(*zs_sublist))))
         ws_list.append(np.array(list(zip(*ws_sublist))))
-        fs_list.append(self.f(ts_train))
+        f_time = self.f(ts_train)
+        if len(f_time.shape)==1:
+            f_time = f_time.reshape([-1, 1])
+        fs_list.append(np.array(list(zip(*f_time))))
 
         print('> **Average Train Error:** {}'.format(self.error()))
 
@@ -312,12 +318,14 @@ class NetworkA:
         _, zs_sublist = zip(*self.z_list['test'])
 
         zs_list.append(np.array(list(zip(*zs_sublist))))
-        ws_list.append(np.full(len(ts_test), ws_sublist[-1]))
-        fs_list.append(self.f(ts_test))
+        ws_list.append(np.array(list(zip(*[ws_sublist[-1]]*len(ts_test)))))
+        f_time = self.f(ts_test)
+        if len(f_time.shape)==1:
+            f_time = f_time.reshape([-1, 1])
+        fs_list.append(np.array(list(zip(*f_time))))
 
         print('> **Average Test Error:** {}'.format(self.error(train_test='test')))
 
-        print(xs_list, ws_list)
         self.FORCE_figure(ts_list, fs_list, zs_list, xs_list, ws_list,
                              neuron_indexes=mask_random).show()
 

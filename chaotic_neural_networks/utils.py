@@ -21,6 +21,12 @@ def triangle(t, freq=1/600, amp=3):
     return amp*signal.sawtooth(2*np.pi*freq*t, 0.5)
 triangle = np.vectorize(triangle)
 
+def cos_fun(t, amp=3., freq=1/300):
+    """Generates a cos function.
+    """
+    return amp*np.cos(np.pi*freq*t)
+cos_fun = np.vectorize(cos_fun)
+
 def complicated_periodic(t, amp=1., freq=1/300, seed=1):
     """Generates a complicated periodic function which a sum of 10 sinusoids.
     """
@@ -32,11 +38,18 @@ complicated_periodic = np.vectorize(complicated_periodic)
 
 
 def both(f, g):
-    """Generates  the functions \\\(t ⟼ (f(t), g(t))\\\)
+    """Generates  the function \\\(t ⟼ (f(t), g(t))\\\)
     """
     return (lambda t: np.array([f(t), g(t)]) if isinstance(t, float) else np.array(list(zip(f(t), g(t)))))
 
 per_tri = both(periodic, triangle)
+
+def triple(f, g, h):
+    """Generates  the function \\\(t ⟼ (f(t), g(t), h(t))\\\)
+    """
+    return (lambda t: np.array([f(t), g(t), h(t)]) if isinstance(t, float) else np.array(list(zip(f(t), g(t), h(t)))))
+
+per_tri_cos = triple(periodic, triangle, cos_fun)
 
 #------------------------------------------------------------
 # General utility functions
