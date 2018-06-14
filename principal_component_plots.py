@@ -5,7 +5,7 @@ import numpy as np
 t_max = 2400
 
 # Target function: Sum of sinusoids
-network = networkA.NetworkA(f=utils.periodic)
+network = networkA.NetworkA()
 
 for _ in np.arange(0, t_max, network.dt):
     network.step(train_test='train')

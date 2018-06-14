@@ -366,7 +366,7 @@ class NetworkA:
             
         # Plotting f and z_eig (projection on leading components)
         ax_fz = fig.add_subplot(gs[0])
-        ax_fz.set_title('Projection onto the {} leading principal components'.format(len(xs_list))).set_fontsize('x-large')
+        ax_fz.set_title('Projection onto the {} leading Principal Components (PC)'.format(len(xs_list))).set_fontsize('x-large')
         
         highest_color = .9 if len(fs_list)>1 else .6
         ax_fz.set_prop_cycle(plt.cycler('color', plt.cm.Greens(np.linspace(0, highest_color, len(fs_list)+1)[1:]))) 
@@ -375,7 +375,7 @@ class NetworkA:
         
         ax_fz.set_prop_cycle(plt.cycler('color', plt.cm.Reds(np.linspace(0, highest_color, len(zs_list)+1)[1:])))
         for j, z in enumerate(zs_list):
-            ax_fz.plot(ts, z, lw=lw_z, label='$z_{'+str(j+1)+'}$' if len(zs_list)>1 else '$z$')
+            ax_fz.plot(ts, z, lw=lw_z, label='Approximation for $f_{'+str(j+1)+'}$' if len(zs_list)>1 else 'Approximation')
         
         ax_fz.legend(loc='best', fancybox=True, framealpha=0.7)
         ax_fz.set_ylim((f_lim[0]-.5, f_lim[1]+.5))
